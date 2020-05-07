@@ -2,14 +2,15 @@
 //error_reporting(E_USER_WARNING | E_USER_NOTICE);
 ini_set('date.timezone','Asia/Shanghai');
 require 'conn.php';
+require 'check_mongo_repl_class.php';
 include 'mail/mail.php';
 include 'weixin/weixin.php';
 
 $result1 = mysqli_query($con,"select ip,tag,user,pwd,port,authdb,monitor,send_mail,
-send_mail_to_list,send_weixin,send_weixin_to_list,threshold_alarm_connection from mongo_status_info");
+send_mail_to_list,send_weixin,send_weixin_to_list,threshold_alarm_connection,threshold_alarm_repl from mongo_status_info");
 
 while( list($ip,$tag,$user,$pwd,$port,$authdb,$monitor,$send_mail,$send_mail_to_list,$send_weixin,
-        $send_weixin_to_list,$threshold_alarm_connection) = mysqli_fetch_array($result1))
+        $send_weixin_to_list,$threshold_alarm_connection,$threshold_alarm_repl) = mysqli_fetch_array($result1))
 {
 
     if($monitor==0 || empty($monitor)){
@@ -38,8 +39,8 @@ while( list($ip,$tag,$user,$pwd,$port,$authdb,$monitor,$send_mail,$send_mail_to_
 
     if ($repl_status == 'Primary') {
         $repl_status_sql="insert into mongo_repl_status(ip,tag,port,role,is_alive,create_time) values('$ip','$tag','$port','$repl_status','online',now())";
-        echo "\n".'MongoDB监控主机：'.$me.' 副本集状态是：'.$repl_status."\n";
-        echo '-----------------------------------------' . "\n\n";
+        echo "\n".'MongoDB监控主机：'.$me.' 副本集状态是：'.$repl_status."\n\n";
+        //echo '-----------------------------------------' . "\n\n";
 
     } else if ($repl_status == 'Secondary') {
         for ($i = 0; $i < count($r['members']); $i++) {
@@ -56,10 +57,15 @@ while( list($ip,$tag,$user,$pwd,$port,$authdb,$monitor,$send_mail,$send_mail_to_
                 //$r_name = ($r['members'][$i]['name']);
                 //echo '$secondary_name: ' . $r_name . "\n";
                 $Seconds_Behind_Master = $primary_sec - $secondary_sec;
-                echo '主从延迟：' . $Seconds_Behind_Master . ' 秒' . "\n";
+                echo '主从同步延迟：' . $Seconds_Behind_Master . ' 秒' . "\n";
                 $repl_status_sql="insert into mongo_repl_status(ip,tag,port,role,is_alive,Seconds_Behind_Master,create_time) 
                                   values('$ip','$tag','$port','$repl_status','online',$Seconds_Behind_Master,now())";
-                echo '-----------------------------------------' . "\n\n";
+                //echo '-----------------------------------------' . "\n\n";
+
+                // Mongo 副本集同步延迟报警检测
+                $check = new Mongo_repl('repl');
+                $check -> check_repl_lag();
+
                 break;
             }
 
@@ -67,11 +73,26 @@ while( list($ip,$tag,$user,$pwd,$port,$authdb,$monitor,$send_mail,$send_mail_to_
 
     } else {
         $repl_status_sql="insert into mongo_repl_status(ip,tag,port,role,is_alive,create_time) values('$ip','$tag','$port','$repl_status','online',now())";
-        echo 'MongoDB监控主机：'.$me.' 副本集状态是：'.$repl_status."\n";
+        echo '【警告】MongoDB监控主机：'.$me.' 副本集状态是：'.$repl_status."\n";
+
+        // Mongo 副本集状态报警检测
+        $check = new Mongo_repl();
+        $check -> check_repl_status();
+
     }
 
-//print_r($r['members']);调试
+//print_r($r['members']);  // 调试
 
-} // end while
+    if (mysqli_query($con, $repl_status_sql)) {
+        echo "{$ip}:'{$tag}'监控数据采集入库成功\n";
+        echo "---------------------------\n\n";
+        mysqli_query($con,"delete from mysql_repl_status where host='{$ip}' and tag like '%{$tag}%' and port='{$port}' 
+                            and create_time<DATE_SUB(now(),interval 100 second)");
+    } else {
+        echo "{$ip}:'{$tag}'监控数据采集入库成功\n";
+        echo "Error: " . $repl_status_sql . "\n" . mysqli_error($con);
+    }
+
+} // end while循环
 
 ?>
