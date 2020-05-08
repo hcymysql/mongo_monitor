@@ -40,7 +40,6 @@ while( list($ip,$tag,$user,$pwd,$port,$authdb,$monitor,$send_mail,$send_mail_to_
     if ($repl_status == 'Primary') {
         $repl_status_sql="insert into mongo_repl_status(ip,tag,port,role,is_alive,create_time) values('$ip','$tag','$port','$repl_status','online',now())";
         echo "\n".'MongoDB监控主机：'.$me.' 副本集状态是：'.$repl_status."\n\n";
-        //echo '-----------------------------------------' . "\n\n";
 
     } else if ($repl_status == 'Secondary') {
         for ($i = 0; $i < count($r['members']); $i++) {
@@ -54,13 +53,10 @@ while( list($ip,$tag,$user,$pwd,$port,$authdb,$monitor,$send_mail,$send_mail_to_
                 $secondary_sec = $op['sec'];
                 echo "\n";
                 echo 'MongoDB监控主机：'.$me.' 副本集状态是：'.$repl_status."\n";
-                //$r_name = ($r['members'][$i]['name']);
-                //echo '$secondary_name: ' . $r_name . "\n";
                 $Seconds_Behind_Master = $primary_sec - $secondary_sec;
                 echo '主从同步延迟：' . $Seconds_Behind_Master . ' 秒' . "\n";
                 $repl_status_sql="insert into mongo_repl_status(ip,tag,port,role,is_alive,Seconds_Behind_Master,create_time) 
                                   values('$ip','$tag','$port','$repl_status','online',$Seconds_Behind_Master,now())";
-                //echo '-----------------------------------------' . "\n\n";
 
                 // Mongo 副本集同步延迟报警检测
                 $check = new Mongo_repl('repl');
@@ -86,7 +82,7 @@ while( list($ip,$tag,$user,$pwd,$port,$authdb,$monitor,$send_mail,$send_mail_to_
     if (mysqli_query($con, $repl_status_sql)) {
         echo "{$ip}:'{$tag}'监控数据采集入库成功\n";
         echo "---------------------------\n\n";
-        mysqli_query($con,"delete from mysql_repl_status where host='{$ip}' and tag like '%{$tag}%' and port='{$port}' 
+        mysqli_query($con,"delete from mongo_repl_status where ip='{$ip}' and tag like '%{$tag}%' and port='{$port}' 
                             and create_time<DATE_SUB(now(),interval 100 second)");
     } else {
         echo "{$ip}:'{$tag}'监控数据采集入库成功\n";
