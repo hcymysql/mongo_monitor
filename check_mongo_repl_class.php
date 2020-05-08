@@ -22,7 +22,6 @@ class Mongo_repl
         global $ip, $tag, $port, $send_mail, $send_mail_to_list, $send_weixin, $send_weixin_to_list, $threshold_alarm_repl;
         global $me,$Seconds_Behind_Master,$repl_status;
 
-	echo '$Seconds_Behind_Master的值是：'.$Seconds_Behind_Master."\n";
         $threshold_alarm_value = 'threshold_alarm_'.$this->check_para;
 
         //同步延迟报警
