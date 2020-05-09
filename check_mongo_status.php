@@ -3,6 +3,7 @@
 ini_set('date.timezone','Asia/Shanghai');
 require 'conn.php';
 require 'check_alive_class.php';
+require 'check_mongo_info_class.php';
 include 'mail/mail.php';
 include 'weixin/weixin.php';
 
@@ -36,7 +37,6 @@ while( list($ip,$tag,$user,$pwd,$port,$authdb,$monitor,$send_mail,$send_mail_to_
         $check->check_alive();
         break;
     } else {
-		//echo 'ok'."\n";
         $check = new Mongo_check_alive($is_alive);
         $check->check_alive();
 	}
@@ -55,7 +55,8 @@ while( list($ip,$tag,$user,$pwd,$port,$authdb,$monitor,$send_mail,$send_mail_to_
 	$opcounters_query_persecond = round($serverStatus_2['opcounters']['query'] - $serverStatus['opcounters']['query']);
 	$opcounters_update_persecond = round($serverStatus_2['opcounters']['update'] - $serverStatus['opcounters']['update']);
 	$opcounters_delete_persecond = round($serverStatus_2['opcounters']['delete'] - $serverStatus['opcounters']['delete']);
-    $repl=$serverStatus['repl']['ismaster'] ? 'Primary' : 'Secondary';
+	$mem_resident = round($serverStatus['mem']['resident']/1024,2); //单位GB
+    $repl_status=$serverStatus['repl']['ismaster'] ? 'Primary' : 'Secondary';
 
 
     // Mongo 连接数报警检测

@@ -78,15 +78,6 @@ class Mongo_check_alive
             }
         }
 
-        /*
-            if (mysqli_query($con, $mongo_status_sql)) {
-                echo "\n{$ip}:'{$tag}' 监控数据采集入库成功\n";
-            } else {
-                echo "\n{$ip}:'{$tag}' 监控数据采集入库失败\n";
-                echo "Error: " . $mongo_status_sql . "\n" . mysqli_error($con);
-            }
-        */
-
     } // end check_alive()
 
 } // end class

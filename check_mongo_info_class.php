@@ -13,7 +13,8 @@ class Mongo_info
     {
         require 'conn.php';
         global $ip, $tag, $port, $send_mail, $send_mail_to_list, $send_weixin, $send_weixin_to_list, $threshold_alarm_connection;
-        global $connections_current;
+        global $version,$uptime,$connections_current,$connections_available,$opcounters_insert_persecond,
+               $opcounters_query_persecond,$opcounters_update_persecond,$opcounters_delete_persecond,$repl_status,$mem_resident;
 
         $threshold_alarm_value = 'threshold_alarm_'.$this->check_para;
 
@@ -69,7 +70,29 @@ class Mongo_info
                 mysqli_query($con, $alarm_status);
             }
         }
+
+        //入库
+        $mongo_info_sql = "REPLACE INTO mongo_status(ip,tag,port,role,is_alive,threads_connected,available_connected,qps_select,qps_insert,qps_update,
+                          qps_delete,mem_usage,runtime,db_version,create_time) 
+                          VALUES('{$ip}','{$tag}','{$port}','{$repl_status}','online','{$connections_current}','{$connections_available}',
+                          $opcounters_query_persecond,$opcounters_insert_persecond,$opcounters_update_persecond,$opcounters_delete_persecond,$mem_resident,
+                          $uptime,'{$version}',now())";
+
+        if (mysqli_query($con, $mongo_info_sql)) {
+            echo "{$ip}:'{$tag}'监控数据采集入库成功\n";
+            echo "---------------------------\n\n";
+            mysqli_query($con,"INSERT INTO mongo_status_history(ip,tag,port,role,is_alive,threads_connected,available_connected,qps_select,qps_insert,qps_update,
+                          qps_delete,mem_usage,runtime,db_version,create_time) 
+                          VALUES('{$ip}','{$tag}','{$port}','{$repl_status}','online','{$connections_current}','{$connections_available}',
+                          $opcounters_query_persecond,$opcounters_insert_persecond,$opcounters_update_persecond,$opcounters_delete_persecond,$mem_resident,
+                          $uptime,'{$version}',now())");
+        } else {
+            echo "{$ip}:'{$tag}'监控数据采集入库成功\n";
+            echo "Error: " . $mongo_info_sql . "\n" . mysqli_error($con);
+        }
+
     } // end check_monitor()
+
 } //end class Mongo_info
 
 ?>
