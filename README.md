@@ -7,6 +7,7 @@ Mongo状态监控
 ![image](https://raw.githubusercontent.com/hcymysql/mongo_monitor/master/demo_image/%E9%A6%96%E9%A1%B5.png)
 
 点击图表，可以查看历史曲线图
+
 1、连接数
 ![image](https://raw.githubusercontent.com/hcymysql/mongo_monitor/master/demo_image/%E8%BF%9E%E6%8E%A5%E6%95%B0.png)
 
@@ -25,4 +26,9 @@ shell> pecl install mongo
 重启httpd服务，service httpd restart
 
 3、创建mongodb超级用户权限（监控采集数据时使用）
-db.createUser({user:"admin",pwd:"123456",roles:[{role:"root",db:"admin"}]})
+首先我们在被监控的数据库端创建授权帐号，允许采集器服务器能连接到Mongodb数据库。由于需要执行命令db.runCommand({serverStatus:1,repl:1}).repl和db.adminCommand( { replSetGetStatus: 1 } ).members，所以需要授予root角色，授权方式如下所示：
+
+    > use admin
+    > db.createUser({user:"admin",pwd:"123456",roles:[{role:"root",db:"admin"}]})
+    
+ 
