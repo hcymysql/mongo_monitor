@@ -7,15 +7,15 @@
 注：监控环境为MongoDB 3.2以上版本，2.X版本未测试。
 
 Mongo状态监控 
-![image](https://raw.githubusercontent.com/hcymysql/mongo_monitor/master/demo_image/%E9%A6%96%E9%A1%B5.png)
+![image](https://s2.51cto.com/images/20200509/1589019055331742.png)
 
 点击图表，可以查看历史曲线图
 
 1、连接数
-![image](https://s2.51cto.com/images/20200509/1589019055331742.png)
+![image](https://s2.51cto.com/images/20200511/1589167815267374.png)
 
 2、QPS
-![image](https://raw.githubusercontent.com/hcymysql/mongo_monitor/master/demo_image/QPS.png)
+![image](https://s2.51cto.com/images/20200511/1589167824217720.png)
 
 # 一、环境搭建
 
