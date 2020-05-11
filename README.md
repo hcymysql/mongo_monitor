@@ -57,7 +57,40 @@ chmod 755 ./weixin/wechat.py
 
 cd /var/www/html/mongo_monitor/
 
-mysql -uroot -p123456 < mongo_monitor_schema.sql
+    mysql -uroot -p123456 < mongo_monitor_schema.sql
 
 2、录入被监控主机的信息
+
+    INSERT INTO `mongo_status_info`
+    (ip,tag,USER,pwd,PORT,authdb,send_mail_to_list,send_weixin_to_list,threshold_alarm_connection,threshold_alarm_repl)
+    VALUES('10.10.159.31','MongoDB测试机1','admin','hechunyang','27017','admin','hechunyang','hechunyang@126.com',1000,60);
+
+注，以下字段可以按照需求变更：
+
+ip字段含义：输入被监控Mongo的IP地址
+
+tag字段含义：输入被监控Mongo的业务名字
+
+user字段含义：输入被监控Mongo的用户名（ROOT权限）
+
+pwd字段含义：输入被监控Mongo的密码
+
+port字段含义：输入被监控MySQL的端口号
+
+authdb字段含义：输入被监控Mongo的数据库登录权限认证库名
+
+monitor字段含义：0为关闭监控（也不采集数据，直接跳过）;1为开启监控（采集数据）
+
+send_mail字段含义：0为关闭邮件报警;1为开启邮件报警
+
+send_mail_to_list字段含义：邮件人列表
+
+send_weixin字段含义：0为关闭微信报警;1为开启微信报警
+
+send_weixin_to_list字段含义：微信公众号
+
+threshold_alarm_connection字段含义：设置连接数阀值（单位个）
+
+threshold_alarm_repl字段含义：设置主从复制延迟阀值（单位秒）
+
 
