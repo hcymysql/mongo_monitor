@@ -12,7 +12,7 @@ Mongo状态监控
 点击图表，可以查看历史曲线图
 
 1、连接数
-![image](https://raw.githubusercontent.com/hcymysql/mongo_monitor/master/demo_image/%E8%BF%9E%E6%8E%A5%E6%95%B0.png)
+![image](https://s2.51cto.com/images/20200509/1589019055331742.png)
 
 2、QPS
 ![image](https://raw.githubusercontent.com/hcymysql/mongo_monitor/master/demo_image/QPS.png)
