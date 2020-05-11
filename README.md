@@ -16,7 +16,7 @@ Mongo状态监控
 
 # 环境搭建
 
-1、环境准备
+1、php-mysql驱动安装
 
 shell> yum install -y php-pear php-devel php gcc openssl openssl-devel cyrus-sasl cyrus-sasl-devel httpd mysql php-mysql
 
