@@ -4,7 +4,7 @@
 
 采用远程连接方式进去获取数据，所以无需要在数据库服务器端部署相关agent或计划任务，可实现微信和邮件报警。
 
-注：监控环境为mongo3.2以上版本，2.X版本未测试。
+注：监控环境为MongoDB 3.2以上版本，2.X版本未测试。
 
 Mongo状态监控 
 ![image](https://raw.githubusercontent.com/hcymysql/mongo_monitor/master/demo_image/%E9%A6%96%E9%A1%B5.png)
