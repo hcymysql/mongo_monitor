@@ -94,3 +94,63 @@ threshold_alarm_connection字段含义：设置连接数阀值（单位个）
 threshold_alarm_repl字段含义：设置主从复制延迟阀值（单位秒）
 
 
+3、修改conn.php配置文件
+
+# vim /var/www/html/mongo_monitor/conn.php
+
+$con = mysqli_connect("127.0.0.1","admin","hechunyang","mongo_monitor","3306") or die("数据库链接错误".mysql_error());
+
+改成你的Mongo Monitor监控工具表结构（mongo_monitor库）连接信息
+
+4、修改邮件报警信息
+
+# cd /var/www/html/mongo_monitor/mail/
+
+# vim mail.php
+
+system("./mail/sendEmail -f chunyang_he@139.com -t '{$this->send_mail_to_list}' -s 
+smtp.139.com:25 -u '{$this->alarm_subject}' -o message-charset=utf8 -o message-content-type=html -m '报警信息：<br><font 
+color='#FF0000'>{$this->alarm_info}</font>' -xu chunyang_he@139.com -xp 
+'123456' -o tls=no");
+
+改成你的发件人地址，账号密码，里面的变量不用修改。
+
+
+5、修改微信报警信息
+
+# cd /var/www/html/mongo_monitor/weixin/
+
+# vim wechat.py
+
+微信企业号设置移步
+
+https://github.com/X-Mars/Zabbix-Alert-WeChat/blob/master/README.md 看此教程配置。
+
+6、定时任务每分钟抓取一次
+
+# crontab -l
+    */1 * * * * cd /var/www/html/mongo_monitor; /usr/bin/php /var/www/html/mongo_monitor/check_mongo_status.php > /dev/null 2 >&1
+    
+    */1 * * * * cd /var/www/html/mongo_monitor; /usr/bin/php /var/www/html/mongo_monitor/check_mongo_repl.php > /dev/null 2 >&1
+    
+# check_mongo_status.php（用来采集被监控端Mongo状态信息和触发报警）
+
+# check_mongo_repl.php（用来采集被监控端Mongo主从复制信息和触发报警）
+
+
+7、更改页面自动刷新频率
+
+# vim mongo_replset_monitor.php
+
+    http-equiv="refresh" content="600"
+
+默认页面每600秒自动刷新一次。
+
+
+8、页面访问
+
+http://yourIP/mongo_monitor/mongo_replset_monitor.php
+
+加一个超链接，可方便地接入你们的自动化运维平台里。
+    
+    
