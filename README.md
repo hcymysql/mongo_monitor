@@ -17,15 +17,19 @@ Mongo状态监控
 # 环境搭建
 
 1、环境准备
+
 shell> yum install -y php-pear php-devel php gcc openssl openssl-devel cyrus-sasl cyrus-sasl-devel httpd mysql php-mysql
 
 2、php-mongo驱动安装：
+
 shell> pecl install mongo
 
 把extension=mongo.so加入到/etc/php.ini最后一行。
+
 重启httpd服务，service httpd restart
 
 3、创建mongodb超级用户权限（监控采集数据时使用）
+
 首先我们在被监控的数据库端创建授权帐号，允许采集器服务器能连接到Mongodb数据库。由于需要执行命令db.runCommand({serverStatus:1,repl:1}).repl和db.adminCommand( { replSetGetStatus: 1 } ).members，所以需要授予root角色，授权方式如下所示：
 
     > use admin
