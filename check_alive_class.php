@@ -40,7 +40,7 @@ class Mongo_check_alive
                 mysqli_query($con, $mongo_status);
             }
 
-            $mongo_status_sql = "REPLACE INTO mongo_status(ip,tag,is_alive,create_time) VALUES('$ip','$tag','offline',now())";
+            $mongo_status_sql = "REPLACE INTO mongo_status(ip,tag,port,is_alive,create_time) VALUES('$ip','$tag','$port','offline',now())";
 
             if (mysqli_query($con, $mongo_status_sql)) {
                 echo "\n{$ip}:'{$tag}' 监控数据采集入库成功\n";
