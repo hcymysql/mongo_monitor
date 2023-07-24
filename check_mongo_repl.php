@@ -31,9 +31,24 @@ while( list($ip,$tag,$user,$pwd,$port,$authdb,$monitor,$send_mail,$send_mail_to_
     echo '监控时间：'.date("Y-m-d H:i:s")."\n";
 
     $serverStatus = $db->command(array('serverStatus' => 1));
+    $version = $serverStatus['version'];
+    $isMongoDB5OrHigher = version_compare($version, '5.0', '>=');
+    echo "版本是：". $version."\n";
     $me = $serverStatus['repl']['me'];
-    $repl_status = $serverStatus['repl']['ismaster'] ? 'Primary' : 'Secondary';
 
+    if ($isMongoDB5OrHigher) {
+        if (isset($serverStatus['repl']['isWritablePrimary']) && $serverStatus['repl']['isWritablePrimary'] == 1) {
+            echo "这台机器的角色是：Primary (主节点)";
+            $repl_status = 'Primary';
+        } elseif (isset($serverStatus['repl']['secondary'])) {
+            echo "这台机器的角色是：Secondary (从节点)";
+            $repl_status = 'Secondary';
+        } else {
+            echo "这台机器的角色无法确定或不是复制集成员。";
+        }
+    } else {
+	$repl_status = $serverStatus['repl']['ismaster'] ? 'Primary' : 'Secondary';
+    }
 
     $r = $db->command(array('replSetGetStatus' => 1));
 

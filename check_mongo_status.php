@@ -43,21 +43,37 @@ while( list($ip,$tag,$user,$pwd,$port,$authdb,$monitor,$send_mail,$send_mail_to_
 
     //收集监控信息
 	$serverStatus = $db->command( array('serverStatus'  =>  1 ) );
+        #print_r($serverStatus);
 	sleep(1);  //等待1秒，相减得到QPS数值
 	$serverStatus_2 = $db->command( array('serverStatus'  =>  1 ) );
 	//print_r($s2); //调试
 
     $version = $serverStatus['version'];
-	$uptime = round($serverStatus['uptime']/86400,1); //天
+    #print($version);
+    $isMongoDB5OrHigher = version_compare($version, '5.0', '>=');
+    $uptime = round($serverStatus['uptime']/86400,1); //天
     $connections_current = $serverStatus['connections']['current'];
     $connections_available = $serverStatus['connections']['available'];
     $opcounters_insert_persecond = round($serverStatus_2['opcounters']['insert'] - $serverStatus['opcounters']['insert']);
-	$opcounters_query_persecond = round($serverStatus_2['opcounters']['query'] - $serverStatus['opcounters']['query']);
-	$opcounters_update_persecond = round($serverStatus_2['opcounters']['update'] - $serverStatus['opcounters']['update']);
-	$opcounters_delete_persecond = round($serverStatus_2['opcounters']['delete'] - $serverStatus['opcounters']['delete']);
-	$mem_resident = round($serverStatus['mem']['resident']/1024,2); //单位GB
-    $repl_status=$serverStatus['repl']['ismaster'] ? 'Primary' : 'Secondary';
+    $opcounters_query_persecond = round($serverStatus_2['opcounters']['query'] - $serverStatus['opcounters']['query']);
+    $opcounters_update_persecond = round($serverStatus_2['opcounters']['update'] - $serverStatus['opcounters']['update']);
+    $opcounters_delete_persecond = round($serverStatus_2['opcounters']['delete'] - $serverStatus['opcounters']['delete']);
+    $mem_resident = round($serverStatus['mem']['resident']/1024,2); //单位GB
 
+    if ($isMongoDB5OrHigher) {
+	if (isset($serverStatus['repl']['isWritablePrimary']) && $serverStatus['repl']['isWritablePrimary'] == 1) {
+	    echo "这台机器的角色是：Primary (主节点)";
+            $repl_status = 'Primary';
+	} elseif (isset($serverStatus['repl']['secondary'])) {
+    	    echo "这台机器的角色是：Secondary (从节点)";
+            $repl_status = 'Secondary';
+	} else {
+   	    echo "这台机器的角色无法确定或不是复制集成员。";
+	}
+    } else {
+        $repl_status=$serverStatus['repl']['ismaster'] ? 'Primary' : 'Secondary';
+    }
+    
 
     // Mongo 连接数报警检测
     $check = new Mongo_info('connection');
