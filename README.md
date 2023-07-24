@@ -5,6 +5,7 @@
 采用远程连接方式获取数据，所以无需要在数据库服务器端部署相关agent或计划任务，可实现微信和邮件报警。
 
 注：监控环境为MongoDB 3.2以上版本，2.X版本未测试。
+##### 2023年7月24日更新 - 增加对MongoDB 5.0的支持，替换check_mongo_repl.php和check_mongo_status.php文件即可。
 
 Mongo状态监控 
 ![image](https://s2.51cto.com/images/20200509/1589019055331742.png)
